@@ -23,12 +23,13 @@ function popUpTemplate(data) {
     `;
 }
 
-getElementsByTagName('body')[0].mouseup(function (event) {
-    let selection = getSelected().trim();
+document.getElementsByTagName('body')[0].addEventListener('mouseup', function (event) {
+    let selection = getSelected().toString().trim();
     let numbers = /^[0-9]+$/;
 
     if (selection && !selection.match(numbers)) {
-
+        console.log(selection);
     }
+    
 });
 
