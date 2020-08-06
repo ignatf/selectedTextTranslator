@@ -9,6 +9,9 @@
 		"js": ["content/main.js"]
 	}],
 	"browser_action": {
-		"default_icon": "logo.png"
-	}
+		"default_icon": "logo.png",
+		"default_popup": "popup.html",
+		"default_title": "A popup"
+	},
+	"web_accessible_resources": ["translator_popup.html", "translator_popup.css"]
 }

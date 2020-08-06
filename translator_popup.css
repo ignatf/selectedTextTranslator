@@ -1,0 +1,7 @@
+#popup-container {
+    display: none;
+    position: absolute;
+    padding: 10px;
+    background-color: white;
+    -webkit-filter: drop-shadow(0 1px 10px rgba(113,158,206,0.8));
+}
