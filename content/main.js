@@ -1,3 +1,5 @@
+
+
 function createPopUp() {
     var popUp = document.createElement('div');
     popUp.id = 'popup-container';
@@ -35,6 +37,10 @@ function intializeTranslatorPopup() {
     };
     xhttp.open("GET", chrome.runtime.getURL('translator_popup.html'), true);
     xhttp.send();
+
+    chrome.runtime.sendMessage('wat');
+
+
 }
 
 function popUpTemplate(data) {
