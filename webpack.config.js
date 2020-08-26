@@ -1,7 +1,7 @@
 const path = require("path");
 
 var config = {
-    // TODO: Add common Configuration
+    mode: 'development',
     module: {},
 };
 

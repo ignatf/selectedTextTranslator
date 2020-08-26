@@ -51,8 +51,18 @@ function popUpTemplate(data) {
 }
 
 function insertPopupData(data) {
-    
+    const word = document.querySelector('#popup-container .word');
+    word.innerHTML = data.word;
+    const wordMeaning = document.querySelector('#popup-container .word-meaning');
+    wordMeaning.innerHTML = data.definition;
+    const loadedContent = document.querySelector('#popup-container .loaded-content');
+    loadedContent.style.display = 'block';
+    const loading = document.querySelector('#popup-container .loading');
+    loading.style.display = 'none';
 }
+
+
+intializeTranslatorPopup();
 
 // Add listener on mouseup to body when page is loaded
 document.getElementsByTagName('body')[0].addEventListener('mouseup', function(event) {
@@ -63,6 +73,7 @@ document.getElementsByTagName('body')[0].addEventListener('mouseup', function(ev
     if (selection && !selection.match(numbers)) {
         chrome.runtime.sendMessage(selection, function(response) {
             console.log(response.meaningsList);
+            insertPopupData(response.meaningsList[0])
         });
 
         popup = document.getElementById('popup-container');
@@ -77,5 +88,3 @@ document.getElementsByTagName('body')[0].addEventListener('mouseup', function(ev
     }
     
 });
-
-intializeTranslatorPopup();

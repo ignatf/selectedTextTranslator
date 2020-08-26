@@ -13,7 +13,7 @@ function receiver(request, sender, sendResponse) {
             "useQueryString": true
         },
         "params": {
-            "term": "wat"
+            "term": request
         }}).then((response) => {
             sendResponse({ meaningsList: response.data.list });
             console.log(response.data.list);
@@ -22,6 +22,6 @@ function receiver(request, sender, sendResponse) {
             console.log(error)
         }
     );
-    
+
     return true;
 }
