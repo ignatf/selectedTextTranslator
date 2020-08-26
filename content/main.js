@@ -37,10 +37,6 @@ function intializeTranslatorPopup() {
     };
     xhttp.open("GET", chrome.runtime.getURL('translator_popup.html'), true);
     xhttp.send();
-
-    chrome.runtime.sendMessage('wat');
-
-
 }
 
 function popUpTemplate(data) {
@@ -54,14 +50,23 @@ function popUpTemplate(data) {
     `;
 }
 
+function insertPopupData(data) {
+    
+}
+
 // Add listener on mouseup to body when page is loaded
-document.getElementsByTagName('body')[0].addEventListener('mouseup', function (event) {
+document.getElementsByTagName('body')[0].addEventListener('mouseup', function(event) {
     let selection = getSelected().toString().trim();
     console.log(selection);
     let numbers = /^[0-9]+$/;
 
     if (selection && !selection.match(numbers)) {
+        chrome.runtime.sendMessage(selection, function(response) {
+            console.log(response.meaningsList);
+        });
+
         popup = document.getElementById('popup-container');
+
         // Getting x and y of scrolling
         // Subtracting border of root element if such exists
         var doc = document.documentElement;
