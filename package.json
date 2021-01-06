@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/ignatf/selectedTextTranslator#readme",
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12"
   }
