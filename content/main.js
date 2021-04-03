@@ -1,4 +1,4 @@
-
+console.log('is it loaded at all?');
 
 function createPopUp() {
     var popUp = document.createElement('div');
@@ -21,7 +21,7 @@ function intializeTranslatorPopup() {
 
     // Add base styles for translator popup
     styles = document.createElement("link");
-    styles.setAttribute("href", chrome.runtime.getURL("translator_popup.css"));
+    styles.setAttribute("href", chrome.runtime.getURL("resources/css/translator_popup.css"));
     styles.setAttribute("rel", "stylesheet");
     styles.setAttribute("type", "text/css");
     document.head.appendChild(styles);
@@ -33,12 +33,15 @@ function intializeTranslatorPopup() {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             popup.innerHTML = this.responseText;
+            assignTabFunctionality();
         }
     };
-    xhttp.open("GET", chrome.runtime.getURL('translator_popup.html'), true);
+    xhttp.open("GET", chrome.runtime.getURL('resources/html/translator_popup.html'), true);
     xhttp.send();
 }
 
+// TODO
+// 1. Review function and delete if unneccessary
 function popUpTemplate(data) {
     return `
         <p id='word'><b>${data.word}</b></p>
@@ -61,19 +64,79 @@ function insertPopupData(data) {
     loading.style.display = 'none';
 }
 
+function erasePopupData() {
+    const word = document.querySelector('#popup-container .word');
+    word.innerHTML = '';
+    const wordMeaning = document.querySelector('#popup-container .word-meaning');
+    wordMeaning.innerHTML = '';
+    const loadedContent = document.querySelector('#popup-container .loaded-content');
+    loadedContent.style.display = 'none';
+    const loading = document.querySelector('#popup-container .loading');
+    loading.style.display = 'block';
+}
+
+// TODO
+// 1. Prevent creation of new window with tabs
+// 2. Send translation with service name to background script
+function switchTab(tab, e) {
+    e = e || window.event;
+    switch (tab.classList[0]) {
+        case 'translation-tab':
+            console.log('trans');
+            e.preventDefault();
+            break;
+        case 'dictionary-tab':
+            console.log('dict');
+            e.preventDefault();
+            break;
+        case 'urban-tab':
+            console.log('udict');
+            e.preventDefault();
+            break;
+        default:
+            break;
+    }
+}
+
+function assignTabFunctionality() {
+    let tabs = document.querySelectorAll('.tablinks');
+    console.log(tabs);
+    for (let i = 0; i < tabs.length; i++) {
+        console.log(tabs[i]);
+
+        tabs[i].onclick = function() { switchTab(tabs[i]) };
+    }
+}
+
+//TODO
+// 1. Union functionality with insertPopupData
+function handleError(selection, error) {
+    const word = document.querySelector('#popup-container .word');
+    word.innerHTML = selection;
+    const wordMeaning = document.querySelector('#popup-container .word-meaning');
+    wordMeaning.innerHTML = error;
+    const loadedContent = document.querySelector('#popup-container .loaded-content');
+    loadedContent.style.display = 'block';
+    const loading = document.querySelector('#popup-container .loading');
+    loading.style.display = 'none';
+}
 
 intializeTranslatorPopup();
 
 // Add listener on mouseup to body when page is loaded
 document.getElementsByTagName('body')[0].addEventListener('mouseup', function(event) {
+    erasePopupData();
     let selection = getSelected().toString().trim();
-    console.log(selection);
     let numbers = /^[0-9]+$/;
 
     if (selection && !selection.match(numbers)) {
-        chrome.runtime.sendMessage(selection, function(response) {
-            console.log(response.meaningsList);
-            insertPopupData(response.meaningsList[0])
+        chrome.runtime.sendMessage({ word: selection, service: '' }, function(response) {
+            console.log(response);
+            if (response.meaningsList) {
+                insertPopupData(response.meaningsList[0])
+            } else if (response.error) {
+                handleError(selection, response.error);
+            }
         });
 
         popup = document.getElementById('popup-container');
@@ -85,6 +148,8 @@ document.getElementsByTagName('body')[0].addEventListener('mouseup', function(ev
         var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
 
         popup.style.cssText = `display: block; top: ${event.clientY + top}px; left: ${event.clientX + left}px;`;
+    } else {
+        popup.style.cssText = 'display: none;';
     }
     
 });

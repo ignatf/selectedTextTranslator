@@ -90,10 +90,23 @@
 /*!**********************************!*\
   !*** ./background/background.js ***!
   \**********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-eval("const axios = __webpack_require__(/*! axios */ \"./node_modules/axios/index.js\");\r\n\r\nchrome.runtime.onMessage.addListener(receiver);\r\n\r\nfunction receiver(request, sender, sendResponse) {\r\n    axios({\r\n        \"method\": \"GET\",\r\n        \"url\": \"https://mashape-community-urban-dictionary.p.rapidapi.com/define\",\r\n        \"headers\": {\r\n            \"content-type\": \"application/octet-stream\",\r\n            \"x-rapidapi-host\": \"mashape-community-urban-dictionary.p.rapidapi.com\",\r\n            \"x-rapidapi-key\": \"b598f70c79msh08876adf9d15f3dp10ef6ajsn6e2508f25e64\",\r\n            \"useQueryString\": true\r\n        },\r\n        \"params\": {\r\n            \"term\": request\r\n        }}).then((response) => {\r\n            sendResponse({ meaningsList: response.data.list });\r\n            console.log(response.data.list);\r\n        }).catch((error) => {\r\n            sendResponse({ error: \"There is no such word in urban dictionary.\"});\r\n            console.log(error)\r\n        }\r\n    );\r\n\r\n    return true;\r\n}\n\n//# sourceURL=webpack:///./background/background.js?");
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ \"./config.js\");\n\r\nconst axios = __webpack_require__(/*! axios */ \"./node_modules/axios/index.js\");\r\n\r\nchrome.runtime.onMessage.addListener(receiver);\r\n\r\n// TODO\r\n// 1. Implemented translation api\r\n// 2. Prepare function for future changes for language settings\r\nfunction getTranslation(word, sender, sendResponse) {\r\n    console.log('word for translation: ' . word);\r\n    sendResponse({error: \"test error\"});\r\n}\r\n\r\nfunction getUrbanDefiniton(word, sender, sendResponse) {\r\n    axios({\r\n        \"method\": \"GET\",\r\n        \"url\": \"https://mashape-community-urban-dictionary.p.rapidapi.com/define\",\r\n        \"headers\": {\r\n            \"content-type\": \"application/octet-stream\",\r\n            \"x-rapidapi-host\": \"mashape-community-urban-dictionary.p.rapidapi.com\",\r\n            \"x-rapidapi-key\": _config__WEBPACK_IMPORTED_MODULE_0__[\"config\"].urbanApi,\r\n            \"useQueryString\": true\r\n        },\r\n        \"params\": {\r\n            \"term\": word\r\n        }}).then((response) => {\r\n            sendResponse({ meaningsList: response.data.list });\r\n            console.log(response.data.list);\r\n        }).catch((error) => {\r\n            sendResponse({ error: \"There is no such word in urban dictionary.\"});\r\n            console.log(error)\r\n        }\r\n    );\r\n}\r\n\r\n// TODO\r\n// 1. Implement dictionary api\r\nfunction getDictionaryDefinition(word, sender, sendResponse) {\r\n    sendResponse({error: \"test error of dictionary\"});\r\n}\r\n\r\nfunction receiver(request, sender, sendResponse) {\r\n    switch (request.service) {\r\n        case 'translate':\r\n            getTranslation(request.word, sender, sendResponse);\r\n            break;\r\n        case 'urban':\r\n            getUrbanDefiniton(request.word, sender, sendResponse);\r\n            break;\r\n        case 'dictionary':\r\n            getDictionaryDefinition(request.word, sender, sendResponse);\r\n            break;\r\n        default:\r\n            getTranslation(request.word, sender, sendResponse);\r\n            break;\r\n    }\r\n\r\n    return true;\r\n}\n\n//# sourceURL=webpack:///./background/background.js?");
+
+/***/ }),
+
+/***/ "./config.js":
+/*!*******************!*\
+  !*** ./config.js ***!
+  \*******************/
+/*! exports provided: config */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"config\", function() { return config; });\nvar config = {\r\n    urbanApi : 'b598f70c79msh08876adf9d15f3dp10ef6ajsn6e2508f25e64'\r\n}\n\n//# sourceURL=webpack:///./config.js?");
 
 /***/ }),
 
