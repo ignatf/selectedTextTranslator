@@ -1,5 +1,6 @@
 import { config } from '../config';
 const axios = require("axios");
+const defaultLanguage = 'ru';
 
 chrome.runtime.onMessage.addListener(receiver);
 
@@ -8,7 +9,31 @@ chrome.runtime.onMessage.addListener(receiver);
 // 2. Prepare function for future changes for language settings
 function getTranslation(word, sender, sendResponse) {
     console.log('word for translation: ' . word);
-    sendResponse({error: "test error"});
+    // axios({
+    //     "method": "POST",
+    //     "url": "https://microsoft-translator-text.p.rapidapi.com/translate",
+    //     "headers": {
+    //         "content-type": "application/json",
+    //         "x-rapidapi-host": "microsoft-translator-text.p.rapidapi.com",
+    //         "x-rapidapi-key": config.rapidApiKey,
+    //         "useQueryString": true
+    //     },
+    //     "params": {
+    //         to: defaultLanguage,
+    //         "api-version": "3.0",
+    //         profanityAction: "NoAction",
+    //         textType: "plain"
+    //     },
+    //     data: [{Text: word}]
+    //     }).then((response) => {
+    //         sendResponse({apiResponse: response.data});
+    //         console.log(response.data);
+    //     }).catch((error) => {
+    //         sendResponse({ error: "There is no translation for such word"});
+    //         console.log(error);
+    //     }
+    // );
+    sendResponse({apiResponse: { detectedLanguage: "en", translation: [{text: 'chto-nibudj', to: 'ru'}] }});
 }
 
 function getUrbanDefiniton(word, sender, sendResponse) {
@@ -18,13 +43,13 @@ function getUrbanDefiniton(word, sender, sendResponse) {
         "headers": {
             "content-type": "application/octet-stream",
             "x-rapidapi-host": "mashape-community-urban-dictionary.p.rapidapi.com",
-            "x-rapidapi-key": config.urbanApi,
+            "x-rapidapi-key": config.rapidApiKey,
             "useQueryString": true
         },
         "params": {
             "term": word
         }}).then((response) => {
-            sendResponse({ meaningsList: response.data.list });
+            sendResponse({ apiResponse: response.data.list });
             console.log(response.data.list);
         }).catch((error) => {
             sendResponse({ error: "There is no such word in urban dictionary."});
@@ -51,6 +76,7 @@ function receiver(request, sender, sendResponse) {
             getDictionaryDefinition(request.word, sender, sendResponse);
             break;
         default:
+            console.log('default');
             getTranslation(request.word, sender, sendResponse);
             break;
     }

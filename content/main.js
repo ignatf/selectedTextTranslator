@@ -1,4 +1,4 @@
-console.log('is it loaded at all?');
+var defaultAction = 'translation';
 
 function createPopUp() {
     var popUp = document.createElement('div');
@@ -38,19 +38,6 @@ function intializeTranslatorPopup() {
     };
     xhttp.open("GET", chrome.runtime.getURL('resources/html/translator_popup.html'), true);
     xhttp.send();
-}
-
-// TODO
-// 1. Review function and delete if unneccessary
-function popUpTemplate(data) {
-    return `
-        <p id='word'><b>${data.word}</b></p>
-        <div>
-            <ul id='word-meaning'>
-                <li id='first-word-meaning'>${data.meaning[0]}</li>
-            </ul>
-        </div>
-    `;
 }
 
 function insertPopupData(data) {
@@ -121,6 +108,20 @@ function handleError(selection, error) {
     loading.style.display = 'none';
 }
 
+function prepareDataForInsert(rawData, action, word) {
+    data = {};
+    switch (action) {
+        case 'translation':
+            data.word = word;
+            data.definition = rawData.translations[0].text;
+            data.language = rawData.detectedLanguage.language;
+            break;
+    
+        default:
+            break;
+    }
+}
+
 intializeTranslatorPopup();
 
 // Add listener on mouseup to body when page is loaded
@@ -133,6 +134,7 @@ document.getElementsByTagName('body')[0].addEventListener('mouseup', function(ev
         chrome.runtime.sendMessage({ word: selection, service: '' }, function(response) {
             console.log(response);
             if (response.meaningsList) {
+                prepareDataForInsert(response.apiResponse, defaultAction, selection);
                 insertPopupData(response.meaningsList[0])
             } else if (response.error) {
                 handleError(selection, response.error);
