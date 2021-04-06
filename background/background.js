@@ -5,8 +5,7 @@ const defaultLanguage = 'ru';
 chrome.runtime.onMessage.addListener(receiver);
 
 // TODO
-// 1. Implemented translation api
-// 2. Prepare function for future changes for language settings
+// 1. Prepare function for future changes for language settings
 function getTranslation(word, sender, sendResponse) {
     console.log('word for translation: ' . word);
     // axios({
@@ -33,7 +32,7 @@ function getTranslation(word, sender, sendResponse) {
     //         console.log(error);
     //     }
     // );
-    sendResponse({apiResponse: { detectedLanguage: "en", translation: [{text: 'chto-nibudj', to: 'ru'}] }});
+    sendResponse({apiResponse: { detectedLanguage: "en", translations: [{text: 'chto-nibudj', to: 'ru'}] }});
 }
 
 function getUrbanDefiniton(word, sender, sendResponse) {
@@ -64,6 +63,8 @@ function getDictionaryDefinition(word, sender, sendResponse) {
     sendResponse({error: "test error of dictionary"});
 }
 
+// TODO
+// 1. Use already loaded data if word is the same
 function receiver(request, sender, sendResponse) {
     switch (request.service) {
         case 'translate':

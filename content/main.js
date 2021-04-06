@@ -1,4 +1,5 @@
 var defaultAction = 'translation';
+var selection = '';
 
 function createPopUp() {
     var popUp = document.createElement('div');
@@ -15,7 +16,7 @@ function getSelected() {
     return false;
 }
 
-// temporary function to create popup and style it
+// temporary function to create popup and style it ?
 function intializeTranslatorPopup() {
     createPopUp();
 
@@ -40,6 +41,9 @@ function intializeTranslatorPopup() {
     xhttp.send();
 }
 
+// TODO
+// 1. Check how new fields could be added
+// 2. Restyle popup
 function insertPopupData(data) {
     const word = document.querySelector('#popup-container .word');
     word.innerHTML = data.word;
@@ -63,14 +67,21 @@ function erasePopupData() {
 }
 
 // TODO
-// 1. Prevent creation of new window with tabs
-// 2. Send translation with service name to background script
+// 1. Move functionality for each case into separate function
+// 2. Finish with dictionary case
 function switchTab(tab, e) {
     e = e || window.event;
     switch (tab.classList[0]) {
         case 'translation-tab':
             console.log('trans');
-            e.preventDefault();
+            chrome.runtime.sendMessage({ word: selection, service: 'translate' }, function(response) {
+                console.log(response);
+                if (response.apiResponse) {
+                    insertPopupData(prepareDataForInsert(response.apiResponse, 'translation', selection))
+                } else if (response.error) {
+                    handleError(selection, response.error);
+                }
+            });
             break;
         case 'dictionary-tab':
             console.log('dict');
@@ -78,7 +89,14 @@ function switchTab(tab, e) {
             break;
         case 'urban-tab':
             console.log('udict');
-            e.preventDefault();
+            chrome.runtime.sendMessage({ word: selection, service: 'urban' }, function(response) {
+                console.log(response);
+                if (response.apiResponse) {
+                    insertPopupData(prepareDataForInsert(response.apiResponse, 'urban', selection))
+                } else if (response.error) {
+                    handleError(selection, response.error);
+                }
+            });
             break;
         default:
             break;
@@ -108,6 +126,9 @@ function handleError(selection, error) {
     loading.style.display = 'none';
 }
 
+// TODO
+// 1. Review data from api. Think about additional usage of new data (langauge, examples, etc.)
+// 2. Finish with dictionary
 function prepareDataForInsert(rawData, action, word) {
     data = {};
     switch (action) {
@@ -116,10 +137,16 @@ function prepareDataForInsert(rawData, action, word) {
             data.definition = rawData.translations[0].text;
             data.language = rawData.detectedLanguage.language;
             break;
-    
+        case 'urban':
+            data.word = word;
+            data.definition = rawData[0].definition;
+            data.example = rawData[0].example;
+            break;
         default:
             break;
     }
+
+    return data;
 }
 
 intializeTranslatorPopup();
@@ -127,15 +154,18 @@ intializeTranslatorPopup();
 // Add listener on mouseup to body when page is loaded
 document.getElementsByTagName('body')[0].addEventListener('mouseup', function(event) {
     erasePopupData();
-    let selection = getSelected().toString().trim();
+    if (selection !== getSelected().toString().trim()) {
+        selection = getSelected().toString().trim();
+    } else {
+        return;
+    }
     let numbers = /^[0-9]+$/;
 
     if (selection && !selection.match(numbers)) {
         chrome.runtime.sendMessage({ word: selection, service: '' }, function(response) {
             console.log(response);
-            if (response.meaningsList) {
-                prepareDataForInsert(response.apiResponse, defaultAction, selection);
-                insertPopupData(response.meaningsList[0])
+            if (response.apiResponse) {
+                insertPopupData(prepareDataForInsert(response.apiResponse, defaultAction, selection))
             } else if (response.error) {
                 handleError(selection, response.error);
             }
