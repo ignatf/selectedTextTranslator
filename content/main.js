@@ -45,43 +45,66 @@ function intializeTranslatorPopup() {
 // 1. Check how new fields could be added
 // 2. Restyle popup
 function insertPopupData(data) {
-    const word = document.querySelector('#popup-container .word');
-    word.innerHTML = data.word;
-    const wordMeaning = document.querySelector('#popup-container .word-meaning');
-    wordMeaning.innerHTML = data.definition;
-    const loadedContent = document.querySelector('#popup-container .loaded-content');
-    loadedContent.style.display = 'block';
-    const loading = document.querySelector('#popup-container .loading');
-    loading.style.display = 'none';
+    if (data.error) {
+        erasePopupData();
+        let wordMeaning = document.querySelector('#popup-container .word-meaning');
+        wordMeaning.innerHTML = data.error;
+    } else {
+        let word = document.querySelector('#popup-container .word');
+        word.innerHTML = data.word;
+        let wordMeaning = document.querySelector('#popup-container .word-meaning');
+        wordMeaning.innerHTML = data.definition;
+        let loadedContent = document.querySelector('#popup-container .loaded-content');
+
+        if (data.language) {
+            let detectedLanguage = document.querySelector('#detected-language');
+            detectedLanguage.innerHTML = `[${data.language}]`;
+        }
+        if (data.example) {
+            let example = document.querySelector('#popup-container .example');
+            example.innerHTML = data.example;
+        }
+        loadedContent.style.display = 'block';
+        let loading = document.querySelector('#popup-container .loading');
+        loading.style.display = 'none';
+    }
 }
 
 function erasePopupData() {
-    const word = document.querySelector('#popup-container .word');
+    let word = document.querySelector('#popup-container .word');
     word.innerHTML = '';
-    const wordMeaning = document.querySelector('#popup-container .word-meaning');
+    let wordMeaning = document.querySelector('#popup-container .word-meaning');
     wordMeaning.innerHTML = '';
-    const loadedContent = document.querySelector('#popup-container .loaded-content');
+    let detectedLanguage = document.querySelector('#detected-language');
+    detectedLanguage.innerHTML = '';
+    let example = document.querySelector('#popup-container .example');
+    example.innerHTML = '';
+
+    let loadedContent = document.querySelector('#popup-container .loaded-content');
     loadedContent.style.display = 'none';
-    const loading = document.querySelector('#popup-container .loading');
+    let loading = document.querySelector('#popup-container .loading');
     loading.style.display = 'block';
 }
 
+function getApiData(service) {
+    chrome.runtime.sendMessage({ word: selection, service: service }, function(response) {
+        console.log(response);
+        if (response.apiResponse) {
+            insertPopupData(prepareDataForInsert(response.apiResponse, service, selection))
+        } else if (response.error) {
+            insertPopupData({ word: selection, error: response.error });
+        }
+    });
+}
+
 // TODO
-// 1. Move functionality for each case into separate function
-// 2. Finish with dictionary case
+// 1. Finish with dictionary case
 function switchTab(tab, e) {
     e = e || window.event;
     switch (tab.classList[0]) {
         case 'translation-tab':
             console.log('trans');
-            chrome.runtime.sendMessage({ word: selection, service: 'translate' }, function(response) {
-                console.log(response);
-                if (response.apiResponse) {
-                    insertPopupData(prepareDataForInsert(response.apiResponse, 'translation', selection))
-                } else if (response.error) {
-                    handleError(selection, response.error);
-                }
-            });
+            getApiData('translation');
             break;
         case 'dictionary-tab':
             console.log('dict');
@@ -89,14 +112,7 @@ function switchTab(tab, e) {
             break;
         case 'urban-tab':
             console.log('udict');
-            chrome.runtime.sendMessage({ word: selection, service: 'urban' }, function(response) {
-                console.log(response);
-                if (response.apiResponse) {
-                    insertPopupData(prepareDataForInsert(response.apiResponse, 'urban', selection))
-                } else if (response.error) {
-                    handleError(selection, response.error);
-                }
-            });
+            getApiData('urban');
             break;
         default:
             break;
@@ -111,19 +127,6 @@ function assignTabFunctionality() {
 
         tabs[i].onclick = function() { switchTab(tabs[i]) };
     }
-}
-
-//TODO
-// 1. Union functionality with insertPopupData
-function handleError(selection, error) {
-    const word = document.querySelector('#popup-container .word');
-    word.innerHTML = selection;
-    const wordMeaning = document.querySelector('#popup-container .word-meaning');
-    wordMeaning.innerHTML = error;
-    const loadedContent = document.querySelector('#popup-container .loaded-content');
-    loadedContent.style.display = 'block';
-    const loading = document.querySelector('#popup-container .loading');
-    loading.style.display = 'none';
 }
 
 // TODO

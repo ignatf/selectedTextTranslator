@@ -4,13 +4,18 @@
     <button class="urban-tab tablinks"">Urban Dictionary</button>
 </div>
 <div class='loaded-content'>
-    <h2 class='word'></h2>
+    <div class='word-container flex'>
+        <h2 class='word'></h2>
+        <span id='detected-language'></span>
+    </div>
     <div>
         <ol class='word-meanings'>
             <li class='word-meaning'></li>
+            <p class='example'></p>
         </ol>
     </div>
 </div>
+<button class='loadmore'>Load more...</button>
 <div class='loading'>
     <h3>Loading...</h3>
 </div>
