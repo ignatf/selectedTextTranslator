@@ -77,8 +77,8 @@ function receiver(request, sender, sendResponse) {
             getDictionaryDefinition(request.word, sender, sendResponse);
             break;
         default:
-            console.log('default');
-            getTranslation(request.word, sender, sendResponse);
+            // console.log('default');
+            // getTranslation(request.word, sender, sendResponse);
             break;
     }
 
