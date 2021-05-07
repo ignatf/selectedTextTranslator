@@ -1,5 +1,8 @@
 var defaultAction = 'translation';
 var selection = '';
+var currentTranslation = {};
+var currentDictionaryMeaning = {};
+var currentUrbanDictionaryMeaning = {};
 
 function createPopUp() {
     var popUp = document.createElement('div');
@@ -41,9 +44,6 @@ function intializeTranslatorPopup() {
     xhttp.send();
 }
 
-// TODO
-// 1. Check how new fields could be added
-// 2. Restyle popup
 function insertPopupData(data) {
     if (data.error) {
         erasePopupData();
@@ -104,7 +104,12 @@ function switchTab(tab, e) {
     switch (tab.classList[0]) {
         case 'translation-tab':
             console.log('trans');
-            getApiData('translation');
+            if (currentTranslation.currentWord !== selection) {
+                getApiData('translation');
+            } else {
+                insertPopupData(prepareDataForInsert(currentTranslation, 'translation', selection));
+                console.log('not using api');
+            } 
             break;
         case 'dictionary-tab':
             console.log('dict');
@@ -112,7 +117,12 @@ function switchTab(tab, e) {
             break;
         case 'urban-tab':
             console.log('udict');
-            getApiData('urban');
+            if (currentUrbanDictionaryMeaning.currentWord !== selection) {
+                getApiData('urban');
+            } else {
+                insertPopupData(prepareDataForInsert(currentUrbanDictionaryMeaning, 'urban', selection));
+                console.log('not using api');
+            } 
             break;
         default:
             break;
@@ -130,17 +140,20 @@ function assignTabFunctionality() {
 }
 
 // TODO
-// 1. Review data from api. Think about additional usage of new data (langauge, examples, etc.)
 // 2. Finish with dictionary
 function prepareDataForInsert(rawData, action, word) {
     data = {};
     switch (action) {
         case 'translation':
+            currentTranslation = rawData;
+            currentTranslation.currentWord = word;
             data.word = word;
             data.definition = rawData.translations[0].text;
             data.language = rawData.detectedLanguage.language;
             break;
         case 'urban':
+            currentUrbanDictionaryMeaning = rawData;
+            currentUrbanDictionaryMeaning.currentWord = word;
             data.word = word;
             data.definition = rawData[0].definition;
             data.example = rawData[0].example;
