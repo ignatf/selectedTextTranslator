@@ -4,6 +4,7 @@
     max-width: 500px;
     background-color: white;
     -webkit-filter: drop-shadow(0 1px 10px rgba(113,158,206,0.8));
+    border-radius: 5px;
 }
 
 #popup-container .loaded-content {
@@ -59,11 +60,17 @@
 .tab button {
     background-color: inherit;
     flex: 1;
-    border: none;
+    border-color: lightgray;
+    border-style: solid;
+    border-width: 0 1px 0 0;
     outline: none;
     cursor: pointer;
     padding: 10px;
     transition: 0.3s;
+}
+
+.tab button:last-of-type {
+    border-right: 0;
 }
 
 .tab button:hover {

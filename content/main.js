@@ -19,7 +19,6 @@ function getSelected() {
     return false;
 }
 
-// temporary function to create popup and style it ?
 function intializeTranslatorPopup() {
     createPopUp();
 
@@ -104,12 +103,14 @@ function switchTab(tab, e) {
     switch (tab.classList[0]) {
         case 'translation-tab':
             console.log('trans');
+
             if (currentTranslation.currentWord !== selection) {
                 getApiData('translation');
             } else {
                 insertPopupData(prepareDataForInsert(currentTranslation, 'translation', selection));
                 console.log('not using api');
             } 
+
             break;
         case 'dictionary-tab':
             console.log('dict');
@@ -117,25 +118,28 @@ function switchTab(tab, e) {
             break;
         case 'urban-tab':
             console.log('udict');
+
             if (currentUrbanDictionaryMeaning.currentWord !== selection) {
                 getApiData('urban');
             } else {
                 insertPopupData(prepareDataForInsert(currentUrbanDictionaryMeaning, 'urban', selection));
                 console.log('not using api');
-            } 
+            }
+
             break;
         default:
             break;
     }
 }
 
+// Assigns on click events to translator popup tabs
 function assignTabFunctionality() {
     let tabs = document.querySelectorAll('.tablinks');
-    console.log(tabs);
-    for (let i = 0; i < tabs.length; i++) {
-        console.log(tabs[i]);
 
-        tabs[i].onclick = function() { switchTab(tabs[i]) };
+    for (let i = 0; i < tabs.length; i++) {
+        tabs[i].onclick = function() { 
+            switchTab(tabs[i]) 
+        };
     }
 }
 

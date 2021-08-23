@@ -17,5 +17,8 @@
 		"default_popup": "./resources/html/popup.html",
 		"default_title": "A popup"
 	},
-	"web_accessible_resources": ["resources/html/translator_popup.html", "resources/css/translator_popup.css"]
+	"web_accessible_resources": ["resources/html/translator_popup.html", "resources/css/translator_popup.css"],
+	"permissions": [
+		"storage"
+	]
 }

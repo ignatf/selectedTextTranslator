@@ -7,7 +7,7 @@ chrome.runtime.onMessage.addListener(receiver);
 // TODO
 // 1. Prepare function for future changes for language settings
 function getTranslation(word, sender, sendResponse) {
-    console.log('word for translation: ' . word);
+    let language = defaultLanguage;
     // axios({
     //     "method": "POST",
     //     "url": "https://microsoft-translator-text.p.rapidapi.com/translate",
@@ -32,7 +32,10 @@ function getTranslation(word, sender, sendResponse) {
     //         console.log(error);
     //     }
     // );
-    sendResponse({apiResponse: { detectedLanguage: {language: "en"}, translations: [{text: 'chto-nibudj', to: 'ru'}] }});
+    chrome.storage.local.get(['translator_language'], function(result) {
+        language = result.translator_language ? result.translator_language : defaultLanguage;        
+        sendResponse({apiResponse: { detectedLanguage: {language: "en"}, translations: [{text: 'chto-nibudj', to: language }] }});
+    });
 }
 
 function getUrbanDefiniton(word, sender, sendResponse) {
