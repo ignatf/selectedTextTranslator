@@ -37,6 +37,7 @@ function intializeTranslatorPopup() {
         if (this.readyState == 4 && this.status == 200) {
             popup.innerHTML = this.responseText;
             assignTabFunctionality();
+            assignShowMoreFunctionality();
         }
     };
     xhttp.open("GET", chrome.runtime.getURL('resources/html/translator_popup.html'), true);
@@ -59,13 +60,17 @@ function insertPopupData(data) {
             let detectedLanguage = document.querySelector('#detected-language');
             detectedLanguage.innerHTML = `[${data.language}]`;
         }
+
         if (data.example) {
             let example = document.querySelector('#popup-container .example');
             example.innerHTML = data.example;
         }
+
         loadedContent.style.display = 'block';
         let loading = document.querySelector('#popup-container .loading');
         loading.style.display = 'none';
+        let loadmore = document.querySelector('.loadmore');
+        loadmore.style.display = 'block';
     }
 }
 
@@ -143,6 +148,17 @@ function assignTabFunctionality() {
     }
 }
 
+function assignShowMoreFunctionality() {
+    let loadmoreButton = document.querySelector('.loadmore');
+    let content = document.querySelector('.loaded-content');
+    let container = document.getElementById('meaning-container');
+
+    loadmoreButton.onclick = function() {
+        content.append(container.cloneNode(true));
+        
+    };
+}
+
 // TODO
 // 2. Finish with dictionary
 function prepareDataForInsert(rawData, action, word) {
@@ -161,6 +177,7 @@ function prepareDataForInsert(rawData, action, word) {
             data.word = word;
             data.definition = rawData[0].definition;
             data.example = rawData[0].example;
+            data.others = rawData;
             break;
         default:
             break;
@@ -173,8 +190,8 @@ intializeTranslatorPopup();
 
 // Add listener on mouseup to body when page is loaded
 document.getElementsByTagName('body')[0].addEventListener('mouseup', function(event) {
-    erasePopupData();
     if (selection !== getSelected().toString().trim()) {
+        erasePopupData();
         selection = getSelected().toString().trim();
     } else {
         return;
